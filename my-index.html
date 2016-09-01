@@ -8,10 +8,132 @@
 </head>
 <body>
 
+  <div class="ui-mask" id="mask" onselectstart="return false"></div>
+  <div class="link"><a href="javascript:showDialog();" >登录</a></div>
+
+  <div class="ui-dialog" id="dialogMove" onselectstart='return false;'>
+    <div class="ui-dialog-title" id="dialogDrag" onselectstart="return false;">
+      登录通行证
+      <a class="ui-dialog-closebutton" href="javascript:hideDialog()"></a>
+
+    </div>
+    <div class="ui-dialog-content">
+      <div class="ui-dialog-l40 ui-dialog-pt15">
+        <input class="ui-dialog-input ui-dialog-input-username" type="input" value="手机/邮箱/用户名" />
+      </div>
+      <div class="ui-dialog-l40 ui-dialog-pt15">
+        <input class="ui-dialog-input ui-dialog-input-password" type="input" value="密码" />
+      </div>
+      <div class="ui-dialog-l40">
+        <a href="#">忘记密码</a>
+      </div>
+      <div>
+        <a class="ui-dialog-submit" href="#" >登录</a>
+      </div>
+      <div class="ui-dialog-l40">
+        <a href="#">立即注册</a>
+      </div>
+    </div>
+  </div>
 
 
-<script type="text/javascript">
+
   
+<script type="text/javascript">
+  function getId(id) {
+    return document.getElementById(id);
+  }
+
+  function autoCenter(el) {
+    var bodyW = document.documentElement.clientWidth;
+    var bodyH = document.documentElement.clientHeight;
+
+    var elW = el.offsetWidth; //获取元素的实际宽和高
+    var elH = el.offsetHeight;
+    el.style.left = (bodyW-elW)/2 +"px";
+    el.style.top = (bodyH-elH)/2 +"px";
+  }
+
+  function fillToBody(el) {
+    el.style.width = document.documentElement.clientWidth +"px";
+    el.style.height = document.documentElement.clientHeight +"px";
+  }
+
+  var mouseOffsetX = 0;
+  var mouseOffsetY = 0;
+  var isDraging = false;  
+
+  getId('dialogDrag').addEventListener('mousedown', function(e) {
+    var e = e || window.event;
+    mouseOffsetX = e.pageX - getId('dialogMove').offsetLeft; 
+    mouseOffsetY = e.pageY - getId('dialogMove').offsetTop;
+    //鼠标的位置e.pageX，e.pageY 减去整个浮层左上角的位置
+    isDraging = true;  //标记为可拖拽
+  });
+
+  document.onmousemove = function(e) {
+    var e = e || window.event;
+    
+    var mouseX = e.pageX; //鼠标移动后的新坐标
+    var mouseY = e.pageY;
+    var moveX = 0;  //浮层的新坐标
+    var moveY = 0;
+    if (isDraging) {
+      //mouseOffsetX，mouseOffsetY 就是鼠标里标题左上角的位置距离
+      moveX = mouseX - mouseOffsetX; 
+      moveY = mouseY - mouseOffsetY;
+
+      //获取页面的宽高
+      var pageWidth  = document.documentElement.clientWidth;
+      var pageHeight = document.documentElement.clientHeight;
+
+      //获取浮层的宽高
+      var dialogWidth  = getId('dialogMove').offsetWidth;
+      var dialogHeight = getId('dialogMove').offsetHeight;
+
+      var maxX = pageWidth - dialogWidth; //只能移动页面宽度-浮层宽度
+      var maxY = pageHeight - dialogHeight; 
+
+      moveX = Math.min(maxX, Math.max(0,moveX));
+      moveY = Math.min(maxY, Math.max(0,moveY));
+
+      getId('dialogMove').style.left = moveX + 'px';
+      getId('dialogMove').style.top = moveY + 'px';
+
+    }
+
+  }
+
+  //不用此代码是因为有可能鼠标在移动时，移出标题区域，那么下面代码将无效
+  // getId('dialogDrag').addEventListener('mouseup', function(e) {
+  //   isDraging = false;
+  // });
+
+  //鼠标松开标记为不可移动
+  document.onmouseup = function () {
+    isDraging = false;
+  }
+
+  //弹出浮层
+  function showDialog() {
+    getId('dialogMove').style.display = 'block';
+    getId('mask').style.display = 'block';
+    autoCenter(getId('dialogMove'));
+    fillToBody(getId('mask'));
+  }
+
+  //隐藏浮层
+  function hideDialog() {
+    getId('dialogMove').style.display = 'none';
+    getId('mask').style.display = 'none';
+  }
+
+  //改变窗口大小事件
+  window.onresize = function () {
+    autoCenter(getId('dialogMove'));
+    fillToBody(getId('mask'));
+  }
+
 </script>
 </body>
 </html>
